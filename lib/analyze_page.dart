@@ -7,9 +7,9 @@ import 'medicine_provider.dart';
 import 'medicine_model.dart';
 
 class AnalyzePage extends StatelessWidget {
-  final List<dynamic> predictions;
+  final String finalPrediction;
 
-  AnalyzePage({required this.predictions});
+  AnalyzePage({required this.finalPrediction});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,10 @@ class AnalyzePage extends StatelessWidget {
                   'Diagnosis',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
-                for (var prediction in predictions) Text(prediction.toString()),
+                Text(
+                  'Final Prediction: $finalPrediction',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ],
             ),
           ),

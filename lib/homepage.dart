@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'analyze_page.dart';
 import 'symptom_fields_provider.dart';
 import 'models.dart';
 import 'package:http/http.dart' as http;
@@ -28,16 +29,22 @@ class _HomepageState extends State<Homepage> {
       );
 
       if (response.statusCode == 200) {
-        var prediction = jsonDecode(response.body);
-        setState(() {
-          _predictionText = 'Predictions: \n';
-          _predictionText +=
-              'SVM prediction: ${prediction['svm_prediction']}\n';
-          _predictionText += 'NB prediction: ${prediction['nb_prediction']}\n';
-          _predictionText += 'RF prediction: ${prediction['rf_prediction']}\n';
-          _predictionText +=
-              'Final prediction: ${prediction['final_prediction']}\n';
-        });
+        var prediction = jsonDecode(response.body) as Map<String, dynamic>;
+
+        // Get the final prediction
+        var finalPrediction = prediction['final_prediction'].toString();
+
+        // Print the other predictions in the terminal
+        print('SVM prediction: ${prediction['svm_prediction']}');
+        print('NB prediction: ${prediction['nb_prediction']}');
+        print('RF prediction: ${prediction['rf_prediction']}');
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AnalyzePage(finalPrediction: finalPrediction),
+          ),
+        );
       } else {
         throw Exception('Failed to load predictions');
       }
@@ -83,50 +90,56 @@ class _HomepageState extends State<Homepage> {
                     SizedBox(height: 10),
                     ..._autocompleteFields,
                     SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        symptomFieldsProvider.addSymptomField(
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Autocomplete<String>(
-                                  optionsBuilder:
-                                      (TextEditingValue textEditingValue) {
-                                    if (textEditingValue.text == '') {
-                                      return const Iterable<String>.empty();
-                                    }
-                                    return listItems.where((String item) {
-                                      return item.contains(
-                                          textEditingValue.text.toLowerCase());
-                                    });
-                                  },
-                                  onSelected: (String selectedItem) {
-                                    symptomFieldsProvider
-                                        .addSymptom(selectedItem);
-                                  },
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          symptomFieldsProvider.addSymptomField(
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Autocomplete<String>(
+                                    optionsBuilder:
+                                        (TextEditingValue textEditingValue) {
+                                      if (textEditingValue.text == '') {
+                                        return const Iterable<String>.empty();
+                                      }
+                                      return listItems.where((String item) {
+                                        return item.contains(textEditingValue
+                                            .text
+                                            .toLowerCase());
+                                      });
+                                    },
+                                    onSelected: (String selectedItem) {
+                                      symptomFieldsProvider
+                                          .addSymptom(selectedItem);
+                                    },
+                                  ),
                                 ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  var index = _autocompleteFields.length - 1;
-                                  var symptom =
-                                      symptomFieldsProvider.symptoms[index];
-                                  symptomFieldsProvider.removeSymptom(symptom);
-                                  symptomFieldsProvider
-                                      .removeSymptomField(index);
-                                },
-                                icon: Icon(Icons.delete),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      child: Text('Add symptom'),
+                                IconButton(
+                                  onPressed: () {
+                                    var index = _autocompleteFields.length - 1;
+                                    var symptom =
+                                        symptomFieldsProvider.symptoms[index];
+                                    symptomFieldsProvider
+                                        .removeSymptom(symptom);
+                                    symptomFieldsProvider
+                                        .removeSymptomField(index);
+                                  },
+                                  icon: Icon(Icons.delete),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        child: Text('Add symptom'),
+                      ),
                     ),
                     SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: _analyzeSymptoms,
-                      child: Text('Analyze'),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: _analyzeSymptoms,
+                        child: Text('Analyze'),
+                      ),
                     ),
                     SizedBox(height: 10),
                     Text(_predictionText), // Display the predictions
