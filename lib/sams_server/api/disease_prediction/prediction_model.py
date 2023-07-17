@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import pickle
+from sklearn import svm
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
@@ -26,6 +27,7 @@ y_test = test_data.iloc[:, -1]
 
 # Train the models
 final_svm_model = SVC()
+final_svm_model = svm.SVC(probability=True)
 final_nb_model = GaussianNB()
 final_rf_model = RandomForestClassifier(random_state=18)
 
