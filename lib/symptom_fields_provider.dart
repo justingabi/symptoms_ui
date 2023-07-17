@@ -1,19 +1,13 @@
-// ignore_for_file: prefer_final_fields
-
 import 'package:flutter/material.dart';
 
 class SymptomFieldsProvider extends ChangeNotifier {
   List<Widget> _autocompleteFields = [];
   List<TextEditingController> _textControllers = [];
-  int _selectedSymptomIndex = 0;
+  List<String> _symptoms = [];
 
   List<Widget> get autocompleteFields => _autocompleteFields;
   List<TextEditingController> get textControllers => _textControllers;
-  int get selectedSymptomIndex => _selectedSymptomIndex;
-  set selectedSymptomIndex(int index) {
-    _selectedSymptomIndex = index;
-    notifyListeners();
-  }
+  List<String> get symptoms => _symptoms;
 
   void addSymptomField(Widget field) {
     var textController = TextEditingController();
@@ -25,6 +19,16 @@ class SymptomFieldsProvider extends ChangeNotifier {
   void removeSymptomField(int index) {
     _autocompleteFields.removeAt(index);
     _textControllers.removeAt(index);
+    notifyListeners();
+  }
+
+  void addSymptom(String symptom) {
+    _symptoms.add(symptom);
+    notifyListeners();
+  }
+
+  void removeSymptom(String symptom) {
+    _symptoms.add(symptom);
     notifyListeners();
   }
 

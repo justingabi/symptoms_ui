@@ -16,20 +16,11 @@ class _HomepageState extends State<Homepage> {
   void _analyzeSymptoms() async {
     var symptomFieldsProvider =
         Provider.of<SymptomFieldsProvider>(context, listen: false);
-    List<String> symptoms = [];
-    var _predictionText = "";
-
-    // Retrieve the entered symptoms from the provider
-    for (var controller in symptomFieldsProvider.textControllers) {
-      var symptom = controller.text;
-      symptoms.add(symptom);
-      print('Entered symptom: $symptom');
-    }
-
-    // Format the symptoms as desired
-    var requestBody = {'symptoms': symptoms};
+    List<String> symptoms = symptomFieldsProvider.symptoms;
 
     try {
+      var requestBody = {'symptoms': symptoms};
+
       var response = await http.post(
         Uri.parse('http://127.0.0.1:8000/predict/'),
         body: jsonEncode(requestBody),
@@ -110,14 +101,19 @@ class _HomepageState extends State<Homepage> {
                                     });
                                   },
                                   onSelected: (String selectedItem) {
-                                    print('Selected item: $selectedItem');
+                                    symptomFieldsProvider
+                                        .addSymptom(selectedItem);
                                   },
                                 ),
                               ),
                               IconButton(
                                 onPressed: () {
-                                  symptomFieldsProvider.removeSymptomField(
-                                      _autocompleteFields.length - 1);
+                                  var index = _autocompleteFields.length - 1;
+                                  var symptom =
+                                      symptomFieldsProvider.symptoms[index];
+                                  symptomFieldsProvider.removeSymptom(symptom);
+                                  symptomFieldsProvider
+                                      .removeSymptomField(index);
                                 },
                                 icon: Icon(Icons.delete),
                               ),
